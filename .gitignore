@@ -1,0 +1,32 @@
+# Ignore downloads folder (contains large video files with long names)
+downloads/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build artifacts
+*.apk
+*.aab
+.bin/
+.buildozer/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.venv
+venv/
+
+# Logs
+*.log
