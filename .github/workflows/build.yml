@@ -27,10 +27,14 @@ jobs:
       continue-on-error: true
     - name: Accept Android SDK licenses
       run: |
-        yes | /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk --licenses
+        yes | /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk --licenses
     - name: Install Android SDK components
       run: |
-        /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk "platform-tools" "platforms;android-34" "build-tools;35.0.0"
+        /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk "platform-tools" "platforms;android-34" "build-tools;34.0.0" "build-tools;35.0.0" "build-tools;33.0.2"
+    - name: Verify build-tools and aidl
+      run: |
+        ls -la /home/runner/.buildozer/android/platform/android-sdk/build-tools/
+        find /home/runner/.buildozer/android/platform/android-sdk -name "aidl" -type f 2>/dev/null
     - name: Build APK
       run: buildozer -v android debug
       working-directory: ./mobile_app
