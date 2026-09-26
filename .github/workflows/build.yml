@@ -25,12 +25,34 @@ jobs:
         cd mobile_app
         buildozer -v android debug || true
       continue-on-error: true
+    - name: Find and install cmdline-tools
+      run: |
+        SDK_ROOT="/home/runner/.buildozer/android/platform/android-sdk"
+        # Find sdkmanager
+        SDKMANAGER=$(find "$SDK_ROOT" -name "sdkmanager" -type f 2>/dev/null | head -1)
+        echo "Found sdkmanager at: $SDKMANAGER"
+        if [ -z "$SDKMANAGER" ]; then
+          echo "Installing cmdline-tools..."
+          mkdir -p "$SDK_ROOT/cmdline-tools"
+          cd "$SDK_ROOT"
+          # Download and install cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip -q cmdline-tools.zip -d cmdline-tools
+          mv cmdline-tools/cmdline-tools cmdline-tools/latest
+          rm cmdline-tools.zip
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+        fi
+        echo "SDKMANAGER=$SDKMANAGER" >> $GITHUB_ENV
     - name: Accept Android SDK licenses
       run: |
-        yes | /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk --licenses
+        yes | $SDKMANAGER --sdk_root=/home/runner/.buildozer/android/platform/android-sdk --licenses
+      env:
+        SDKMANAGER: ${{ env.SDKMANAGER }}
     - name: Install Android SDK components
       run: |
-        /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk "platform-tools" "platforms;android-34" "build-tools;34.0.0" "build-tools;35.0.0" "build-tools;33.0.2"
+        $SDKMANAGER --sdk_root=/home/runner/.buildozer/android/platform/android-sdk "platform-tools" "platforms;android-34" "build-tools;34.0.0" "build-tools;35.0.0" "build-tools;33.0.2"
+      env:
+        SDKMANAGER: ${{ env.SDKMANAGER }}
     - name: Verify build-tools and aidl
       run: |
         ls -la /home/runner/.buildozer/android/platform/android-sdk/build-tools/
